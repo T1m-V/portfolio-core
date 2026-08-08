@@ -22,16 +22,23 @@ clients, FastAPI code, and React code out of this repository.
 
 - `portfolio_core.settings`
   - resolves `PORTFOLIO_DATA_DIR`, persisted user configuration, and the platform default;
-  - loads secrets from the selected data workspace;
-  - persists the chosen data directory.
+  - loads `.env` from the selected data workspace when an application opts in;
+  - persists the chosen data directory for the dashboard CLI.
+- `portfolio_core.context`
+  - combines settings and paths at an explicit application boundary;
+  - provides task-local activation for a single synchronous call tree, never a process-global
+    data root.
 - `portfolio_core.paths`
   - defines the one authoritative external workspace layout;
-  - provides lazy metadata mappings and path constants used by consumers.
+  - exposes immutable paths rooted in a caller-supplied directory.
 - `portfolio_core.schema`
   - validates `portfolio.toml` and `schema_version`.
 - `portfolio_core.price_history`
   - normalizes, merges, reads, and writes canonical price history;
   - provides as-of price and forex lookup.
+- `portfolio_core.workspace`
+  - serializes loader mutations with a workspace lock;
+  - provides atomic file replacement and per-component run manifests.
 
 The data workspace is runtime state. Never infer a data path from a source checkout.
 
@@ -85,4 +92,5 @@ Python is pinned to 3.14. uv stores the actual environment in its centralized ca
 - Do not read or print credentials while testing settings behavior.
 - Use temporary directories for path and schema tests.
 - Do not mutate the real portfolio data workspace from unit tests.
+- Keep mutation locks and manifests under `runtime/`; never invent package-specific lock files.
 - Preserve unrelated user changes and do not commit build artifacts from `dist/`.

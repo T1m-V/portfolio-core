@@ -7,5 +7,15 @@ uv sync
 uv run pytest
 ```
 
-Set `PORTFOLIO_DATA_DIR` or call `save_data_directory(...)` once to select the external data
-workspace. Source checkouts are never used as data locations.
+Create a `PortfolioContext` at an application boundary and pass its `paths` explicitly to
+operations:
+
+```python
+from portfolio_core import PortfolioContext
+
+context = PortfolioContext.load("C:/portfolio-data")
+price_path = context.paths.direct_price("USD_EUR")
+```
+
+`PORTFOLIO_DATA_DIR` and `save_data_directory(...)` remain CLI conveniences. Package modules do
+not retain a process-global workspace or infer data paths from source checkouts.

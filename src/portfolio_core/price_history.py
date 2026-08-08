@@ -5,7 +5,7 @@ from typing import Any
 
 import pandas as pd
 
-from portfolio_core.paths import PRICES_FOLDER
+from portfolio_core.workspace import atomic_write_csv
 
 PRICE_COLUMNS = ["Date", "Price"]
 
@@ -49,15 +49,14 @@ def load_price_csv(file_path: Path) -> pd.DataFrame:
 
 
 def save_price_csv(*, frame: pd.DataFrame, file_path: Path) -> None:
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    normalize_price_frame(frame).to_csv(file_path, index=False)
+    atomic_write_csv(frame=normalize_price_frame(frame), path=file_path)
 
 
-def get_forex_rate(currency: str, date: str, prices_folder: Path | None = None) -> float:
+def get_forex_rate(*, currency: str, date: str, prices_folder: Path) -> float:
     """Return the as-of rate from a canonical CURRENCY_EUR price file."""
     if currency == "EUR":
         return 1.0
-    path = (prices_folder or PRICES_FOLDER) / f"{currency}_EUR.csv"
+    path = prices_folder / f"{currency}_EUR.csv"
     frame = load_price_csv(path)
     if frame.empty:
         raise FileNotFoundError(f"No forex data for {currency}: {path}")
@@ -68,10 +67,8 @@ def get_forex_rate(currency: str, date: str, prices_folder: Path | None = None) 
     return float(row["Price"])
 
 
-def price_on_or_before(
-    *, symbol: str, date: str, prices_folder: Path | None = None
-) -> float:
-    path = (prices_folder or PRICES_FOLDER) / f"{symbol}.csv"
+def price_on_or_before(*, symbol: str, date: str, prices_folder: Path) -> float:
+    path = prices_folder / f"{symbol}.csv"
     frame = load_price_csv(path)
     if frame.empty:
         raise FileNotFoundError(path)
