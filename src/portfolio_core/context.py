@@ -9,8 +9,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
 from portfolio_core.paths import PortfolioPaths
-from portfolio_core.settings import PortfolioSettings
+from portfolio_core.settings import resolve_data_directory
 
 _ACTIVE_CONTEXT: ContextVar[PortfolioContext | None] = ContextVar(
     "portfolio_context",
@@ -22,7 +24,6 @@ _ACTIVE_CONTEXT: ContextVar[PortfolioContext | None] = ContextVar(
 class PortfolioContext:
     """Explicit runtime context passed across application boundaries."""
 
-    settings: PortfolioSettings
     paths: PortfolioPaths
 
     @classmethod
@@ -32,8 +33,10 @@ class PortfolioContext:
         *,
         load_secrets: bool = True,
     ) -> PortfolioContext:
-        settings = PortfolioSettings.load(data_dir, load_secrets=load_secrets)
-        return cls(settings=settings, paths=PortfolioPaths.from_root(settings.data_dir))
+        root = resolve_data_directory(data_dir)
+        if load_secrets:
+            load_dotenv(root / ".env", override=False)
+        return cls(paths=PortfolioPaths(root=root))
 
     @classmethod
     def from_root(cls, root: str | Path, *, load_secrets: bool = True) -> PortfolioContext:
@@ -72,5 +75,4 @@ def active_context() -> PortfolioContext:
 def _load_metadata(path: Path) -> dict[str, dict[str, Any]]:
     if not path.exists():
         return {}
-    with path.open(encoding="utf-8") as metadata_file:
-        return json.load(metadata_file)
+    return json.loads(path.read_text(encoding="utf-8"))

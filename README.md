@@ -43,5 +43,6 @@ context = PortfolioContext.load("C:/portfolio-data")
 price_path = context.paths.direct_price("USD_EUR")
 ```
 
-`PORTFOLIO_DATA_DIR` and `save_data_directory(...)` remain CLI conveniences. Package modules do
-not retain a process-global workspace or infer data paths from source checkouts.
+`PortfolioContext.load()` resolves an explicit path, `PORTFOLIO_DATA_DIR`, or the path saved by
+`save_data_directory(...)`. It fails when none is configured; package modules never infer a data
+path from a source checkout.

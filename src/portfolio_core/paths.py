@@ -10,10 +10,6 @@ class PortfolioPaths:
 
     root: Path
 
-    @classmethod
-    def from_root(cls, root: str | Path) -> PortfolioPaths:
-        return cls(root=Path(root).expanduser().resolve())
-
     @property
     def config(self) -> Path:
         return self.root / "config"
@@ -104,6 +100,3 @@ class PortfolioPaths:
 
     def direct_price(self, symbol: str) -> Path:
         return self.prices / f"{symbol}.csv"
-
-    def lp_price(self, *, chain: str, symbol: str) -> Path:
-        return self.lp_prices / chain / f"{symbol}.csv"
