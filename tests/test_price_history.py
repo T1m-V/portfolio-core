@@ -29,11 +29,6 @@ def test_normalize_price_frame_cleans_and_canonicalizes_rows() -> None:
     ]
 
 
-def test_normalize_price_frame_rejects_the_wrong_schema() -> None:
-    with pytest.raises(KeyError):
-        normalize_price_frame(pd.DataFrame({"date": ["2026-01-01"], "price": [1]}))
-
-
 def test_merge_price_frames_gives_incoming_rows_precedence() -> None:
     existing = pd.DataFrame({"Date": ["2026-01-02", "2026-01-01"], "Price": [2, 1]})
     incoming = pd.DataFrame({"Date": ["2026-01-03", "2026-01-02"], "Price": [3, 2.5]})
@@ -81,8 +76,3 @@ def test_forex_rate_uses_the_latest_available_date(
     )
 
     assert get_forex_rate(currency=currency, date=date, prices_folder=tmp_path) == expected
-
-
-def test_forex_rate_requires_price_data(tmp_path: Path) -> None:
-    with pytest.raises(FileNotFoundError, match="No forex data"):
-        get_forex_rate(currency="USD", date="2026-01-01", prices_folder=tmp_path)

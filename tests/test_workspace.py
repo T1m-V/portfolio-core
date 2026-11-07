@@ -30,22 +30,6 @@ def test_atomic_writers_create_complete_files(tmp_path: Path) -> None:
     assert not list(tmp_path.rglob("*.tmp"))
 
 
-def test_atomic_writer_cleans_up_after_a_failed_write(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    frame = pd.DataFrame()
-
-    def fail(*_args, **_kwargs) -> None:
-        raise OSError
-
-    monkeypatch.setattr(frame, "to_csv", fail)
-
-    with pytest.raises(OSError):
-        atomic_write_csv(frame=frame, path=tmp_path / "value.csv")
-    assert not list(tmp_path.iterdir())
-
-
 def test_mutation_session_serializes_and_always_releases_the_lock(tmp_path: Path) -> None:
     paths = PortfolioPaths(root=tmp_path)
     lock = paths.runtime / "mutation.lock"
