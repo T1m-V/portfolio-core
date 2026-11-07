@@ -49,7 +49,7 @@ def test_context_loads_workspace_metadata_and_environment(
     (tmp_path / ".env").write_text("GETQUIN_TOKEN=test-token\n", encoding="utf-8")
     monkeypatch.delenv("GETQUIN_TOKEN", raising=False)
 
-    context = PortfolioContext.from_root(tmp_path)
+    context = PortfolioContext.load(tmp_path)
 
     assert context.stock_metadata() == {"BTC": {"name": "Bitcoin"}}
     assert context.currency_metadata() == {}
@@ -57,7 +57,7 @@ def test_context_loads_workspace_metadata_and_environment(
 
 
 def test_context_activation_is_scoped(tmp_path: Path) -> None:
-    context = PortfolioContext.from_root(tmp_path, load_secrets=False)
+    context = PortfolioContext.load(tmp_path, load_secrets=False)
 
     with pytest.raises(RuntimeError, match="No PortfolioContext"):
         active_context()
@@ -68,7 +68,7 @@ def test_context_activation_is_scoped(tmp_path: Path) -> None:
 
 
 def test_paths_match_the_persisted_workspace_layout(tmp_path: Path) -> None:
-    paths = PortfolioContext.from_root(tmp_path, load_secrets=False).paths
+    paths = PortfolioContext.load(tmp_path, load_secrets=False).paths
     expected = {
         "stock_metadata": "config/stock_metadata.json",
         "currency_metadata": "config/currency_metadata.json",

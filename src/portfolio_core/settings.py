@@ -11,11 +11,11 @@ DATA_DIR_ENV = "PORTFOLIO_DATA_DIR"
 
 
 def _config_path() -> Path:
-    return user_config_path("portfolio-dashboard", appauthor=False) / "config.toml"
+    return user_config_path("portfolio", appauthor=False) / "config.toml"
 
 
 def resolve_data_directory(data_dir: str | Path | None = None) -> Path:
-    """Resolve an explicit, environment, or dashboard-configured workspace."""
+    """Resolve an explicit, environment, or persisted user workspace."""
     if data_dir is not None:
         return Path(data_dir).expanduser().resolve()
 
@@ -25,8 +25,8 @@ def resolve_data_directory(data_dir: str | Path | None = None) -> Path:
     config_path = _config_path()
     if not config_path.exists():
         raise RuntimeError(
-            f"Portfolio data directory is not configured; set {DATA_DIR_ENV} or run "
-            "portfolio-dashboard configure --data-dir PATH"
+            f"Portfolio data directory is not configured; set {DATA_DIR_ENV} or call "
+            "save_data_directory(PATH)"
         )
     with config_path.open("rb") as config_file:
         config = tomllib.load(config_file)

@@ -38,10 +38,6 @@ class PortfolioContext:
             load_dotenv(root / ".env", override=False)
         return cls(paths=PortfolioPaths(root=root))
 
-    @classmethod
-    def from_root(cls, root: str | Path, *, load_secrets: bool = True) -> PortfolioContext:
-        return cls.load(root, load_secrets=load_secrets)
-
     def stock_metadata(self) -> dict[str, dict[str, Any]]:
         return _load_metadata(self.paths.stock_metadata)
 
